@@ -1,0 +1,75 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "People";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="peopleList" data-bind="with: peopleList">
+    <div class="table-responsive">
+        <table class="table" id="people">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Palindrome</th>
+                    <th>Authorised</th>
+                    <th>Enabled</th>
+                    <th>Colours</th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: people">
+                <tr>
+                    <td><a href="#" data-bind="text: FullName, click: $root.editPerson"></a></td>
+                    <td><span data-bind="css: PalindromeClass"></span></td>
+                    <td><span data-bind="css: AuthorisedClass"></span></td>
+                    <td><span data-bind="css: EnabledClass"></span></td>
+                    <td data-bind="text: ColourString"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@Html.Partial("Partials/_EditPerson")
+
+@section Scripts
+{
+    <script src="~/KnockoutModels/PersonList.js"></script>
+
+    <script>
+        var viewModel;
+
+        function TechTestVm() {
+            var self = this;
+            self.peopleList = ko.observable();
+            self.chosenPerson = ko.observable();
+
+            self.showPeopleList = function() {
+                self.chosenPerson(null);
+
+                var peopleList = new PersonList();
+                peopleList.getPeople();
+
+                self.peopleList(peopleList);
+            };
+
+            self.editPerson = function(person) {
+                self.peopleList(null);
+                self.chosenPerson(person);
+
+                $("label").click(function(event) {
+                    event.preventDefault();
+                    var id = $(this).attr("for");
+                    $("#" + id).toggle();
+                });
+            };
+
+            self.showPeopleList();
+        }
+
+        $(document).ready(function() {
+            viewModel = new TechTestVm();
+            ko.applyBindings(viewModel);
+        });
+    </script>
+}
